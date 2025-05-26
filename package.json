@@ -6,14 +6,24 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "bunx --bun @biomejs/biome format --write .",
+    "format:check": "bunx --bun @biomejs/biome format .",
+    "lint": "bunx --bun @biomejs/biome lint .",
+    "lint:fix": "bunx --bun @biomejs/biome lint --write .",
+    "check": "bunx --bun @biomejs/biome check .",
+    "check:fix": "bunx --bun @biomejs/biome check --write .",
+    "prepare": "husky"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.7",
+    "husky": "^9.1.7",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
