@@ -3,31 +3,43 @@ import { useState } from 'react'
 function App() {
   const timestamp = new Date().toLocaleTimeString()
   const [prompt, setPrompt] = useState('')
+  const [isDisabled, setIsDisabled] = useState(true)
 
+  // 入力変更をハンドリング
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const input = event.target.value
     setPrompt(input)
-    const charCount = input.length
     // ここで文字数を表示するロジックを追加できます
-    console.log(`文字数: ${charCount}/500`)
+    console.log(`文字数: ${input.length}/500`)
+    const shouldDisable = !input.trim() || input.length > 500
+    setIsDisabled(shouldDisable)
   }
 
+  // Key入力をハンドリング
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     switch (event.key) {
       case 'Enter':
-        event.preventDefault()
-        // 送信処理をここに追加
-        console.log('Enterキーが押されました')
+        if (event.shiftKey) {
+          event.preventDefault()
+          if (!isDisabled) {
+            console.log('メッセージ送信:', prompt.trim())
+            setPrompt('')
+            setIsDisabled(true)
+          }
+        }
         break
 
       case 'Backspace':
         event.preventDefault()
-        setPrompt('') // バックスペースキーで入力をクリア
-        console.log('Backspaceキーが押され、入力がクリアされました')
+        if (event.shiftKey) {
+          console.log('Shift + Backspaceキーが押されました')
+          setPrompt('') // バックスペースキーで入力をクリア
+        } else {
+          setPrompt(prompt.slice(0, -1))
+        }
         break
 
       default:
-        console.log(`他のキーが押されました: ${event.key}`)
         break
     }
   }
@@ -65,13 +77,20 @@ function App() {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                 />
-                <button className="ml-2">
-                  <p className="py-1 px-2 border-gray-600 border-2 rounded-md text-sm text-gray-600">
+                <button type="button" className="ml-2" disabled={isDisabled}>
+                  <p
+                    className={`py-1 px-2 border-gray-600 border-2 rounded-md text-sm text-gray-600
+                  ${
+                    isDisabled
+                      ? 'border-gray-300 text-gray-400 bg-gray-50'
+                      : 'border-gray-600 text-gray-600 hover:bg-gray-50 cursor-pointer'
+                  }`}
+                  >
                     送信
                   </p>
                 </button>
               </div>
-              <small className="text-xs text-right text-gray-500 mt-auto">0/500文字</small>
+              <small className="text-xs text-right text-gray-500 mt-auto">{`${prompt.length}/500文字`}</small>
             </div>
           </section>
         </article>
