@@ -1,13 +1,17 @@
 import { useState } from 'react'
+import WebSocketDialog from './websocket.dialog'
 
 function App() {
   const timestamp = new Date().toLocaleTimeString()
   const [prompt, setPrompt] = useState('')
   const [isDisabled, setIsDisabled] = useState(true)
+  const [showDialog, setShowDialog] = useState(true)
   const port = import.meta.env.VITE_WEB_SOCKET_PORT || 3000
 
-  const socket = new WebSocket(`ws://localhost:${port}`)
-  console.log(`WebSocket接続: ws://localhost:${port} ${socket.readyState}`)
+  // 再レンダリングが走らない場所で、接続を開始する必要がある
+  // 接続開始するコンポーネントが必要で、そこから接続を行う
+  const ws = new WebSocket(`ws://localhost:${port}`)
+  console.log(`WebSocket接続: ws://localhost:${port} ${ws.readyState}`)
 
   // 入力変更をハンドリング
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -48,8 +52,14 @@ function App() {
     }
   }
 
+  function handleDialogClose() {
+    setShowDialog(false)
+    ws.close()
+    console.log('WebSocket接続を閉じました')
+  }
+
   return (
-    <div className="flex h-dvh w-full bg-white text-black">
+    <div className="flex h-dvh w-full bg-white text-black relative">
       <div className="p-2 w-80 bg-white border-r border-gtay-300 flex flex-col">
         <h1 className="text-2xl">Chat App</h1>
         <p>text</p>
@@ -81,7 +91,19 @@ function App() {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                 />
-                <button type="button" className="ml-2" disabled={isDisabled}>
+                <button
+                  type="button"
+                  className="ml-2"
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (prompt.trim) {
+                      console.log('メッセージ送信:', prompt.trim())
+                      // ws.send(prompt.trim())
+                      setPrompt('')
+                      setIsDisabled(true)
+                    }
+                  }}
+                >
                   <p
                     className={`py-1 px-2 border-gray-600 border-2 rounded-md text-sm text-gray-600
                   ${
@@ -99,6 +121,7 @@ function App() {
           </section>
         </article>
       </main>
+      <WebSocketDialog isOpen={showDialog} onClose={handleDialogClose} />
     </div>
   )
 }
