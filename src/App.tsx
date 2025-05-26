@@ -4,6 +4,10 @@ function App() {
   const timestamp = new Date().toLocaleTimeString()
   const [prompt, setPrompt] = useState('')
   const [isDisabled, setIsDisabled] = useState(true)
+  const port = import.meta.env.VITE_WEB_SOCKET_PORT || 3000
+
+  const socket = new WebSocket(`ws://localhost:${port}`)
+  console.log(`WebSocket接続: ws://localhost:${port} ${socket.readyState}`)
 
   // 入力変更をハンドリング
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
