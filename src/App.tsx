@@ -6,13 +6,6 @@ function App() {
   const [prompt, setPrompt] = useState('')
   const [isDisabled, setIsDisabled] = useState(true)
   const [showDialog, setShowDialog] = useState(true)
-  const port = import.meta.env.VITE_WEB_SOCKET_PORT || 3000
-
-  // 再レンダリングが走らない場所で、接続を開始する必要がある
-  // 接続開始するコンポーネントが必要で、そこから接続を行う
-  const ws = new WebSocket(`ws://localhost:${port}`)
-  console.log(`WebSocket接続: ws://localhost:${port} ${ws.readyState}`)
-
   // 入力変更をハンドリング
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const input = event.target.value
@@ -98,7 +91,7 @@ function App() {
                   onClick={() => {
                     if (prompt.trim) {
                       console.log('メッセージ送信:', prompt.trim())
-                      // ws.send(prompt.trim())
+                      ws?.send(prompt.trim())
                       setPrompt('')
                       setIsDisabled(true)
                     }
